@@ -1,0 +1,4 @@
+[submodule "community-compiler"]
+	path = community-compiler
+	url = https://github.com/openmultiplayer/compiler.git
+	branch = master

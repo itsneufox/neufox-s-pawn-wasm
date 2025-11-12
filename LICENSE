@@ -19,3 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+This project uses the open.mp Pawn Compiler (https://github.com/openmultiplayer/compiler),
+which is licensed under the zLib/libpng license. See the community-compiler submodule for
+the full license text.
+
+The Pawn compiler is copyright (c) 1997-2006 by ITB CompuPhase and is provided "as-is"
+under the zLib/libpng license, which permits use in commercial applications and
+redistribution with appropriate attribution.
