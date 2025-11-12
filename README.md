@@ -13,13 +13,12 @@ WebAssembly build of the [open.mp Pawn Compiler](https://github.com/openmultipla
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/itsneufox/neufox-s-pawn-wasm.git
-cd pawn-wasm
+# Clone with submodules (recommended)
+git clone --recursive https://github.com/itsneufox/neufox-s-pawn-wasm.git
+cd neufox-s-pawn-wasm
 ```
 
-### Initialize Submodules
-
-This project uses the open.mp Pawn Compiler as a git submodule:
+If you already cloned without `--recursive`:
 
 ```bash
 git submodule update --init --recursive
@@ -66,24 +65,36 @@ npm run clean       # Clean build artifacts
 ## Usage
 
 ```typescript
-import { initCompiler, compile, addIncludeFile, addIncludeFiles } from '@pawn-fiddle/pawn-wasm';
+import {
+  initCompiler,
+  compile,
+  addIncludeFile,
+  addIncludeFiles,
+  loadIncludeFiles
+} from '@pawn-fiddle/pawn-wasm';
 
 // Initialize the compiler (do this once)
 await initCompiler();
 
-// Add include files to the virtual filesystem
+// IMPORTANT: This package does NOT bundle include files
+// You must provide your own SA-MP/open.mp/plugin includes
+
 // Option 1: Add a single include file
 addIncludeFile('a_samp.inc', includeFileContent);
 
-// Option 2: Add multiple include files at once
+// Option 2: Add multiple include files at once (recommended)
 addIncludeFiles([
   { filename: 'a_samp.inc', content: sampIncludeContent },
   { filename: 'core.inc', content: coreIncludeContent },
   { filename: 'float.inc', content: floatIncludeContent }
 ]);
 
-// Option 3: Load from a remote directory
-await loadIncludeFiles('/includes', ['a_samp.inc', 'core.inc', 'float.inc']);
+// Option 3: Load from a remote directory or CDN
+await loadIncludeFiles('https://cdn.example.com/includes', [
+  'a_samp.inc',
+  'core.inc',
+  'float.inc'
+]);
 
 // Compile some code
 const result = await compile(`
@@ -102,6 +113,18 @@ console.log(result.output);  // Compiler output
 console.log(result.errors);  // Array of errors
 console.log(result.warnings); // Array of warnings
 ```
+
+## Include Files
+
+**Important:** This package does not ship SA-MP, open.mp, or plugin include files. The compiler looks for includes inside its virtual `/include` directory, so you must add every `.inc` your script references before calling `compile()`.
+
+- **When to add them:** Add once after `initCompiler()` (or whenever the user uploads new ones). The files persist until the page reloads or you call `cleanup()`.
+- **How to add them:**
+  - `addIncludeFile('core.inc', content)` for a single in-memory string (works with user uploads or stored strings).
+  - `addIncludeFiles([{ filename: 'a_samp.inc', content: samp }, ...])` for bulk loading.
+  - `await loadIncludeFiles('https://cdn.example.com/includes', ['a_samp.inc'])` to fetch from your server/CDN. Pass the base URL without the trailing filename—the helper appends `/filename`.
+- **Subdirectories:** Pass paths like `plugins/streamer.inc` if you rely on `#include <plugins/streamer>`.
+- **Verification:** If the compiler reports `cannot read from file`, double-check that the filename (without `.inc`) matches exactly and that the file was added before compilation.
 
 ## API
 

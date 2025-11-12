@@ -16,28 +16,46 @@ source ./emsdk_env.sh
 ## 2. Build WASM Compiler
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/pawn-wasm.git
-cd pawn-wasm
-
-# Initialize submodules (open.mp Pawn Compiler)
-git submodule update --init --recursive
+# Clone the repository with submodules
+git clone --recursive https://github.com/itsneufox/neufox-s-pawn-wasm.git
+cd neufox-s-pawn-wasm
 
 # Install dependencies and build
 npm install
 npm run build
 ```
 
+If you forgot `--recursive`:
+```bash
+git submodule update --init --recursive
+```
+
 ## 3. Use in Your Code
 
 ```typescript
-import { initCompiler, compile, addIncludeFile } from '@pawn-fiddle/pawn-wasm';
+import {
+  initCompiler,
+  compile,
+  addIncludeFile,
+  addIncludeFiles,
+  loadIncludeFiles
+} from '@pawn-fiddle/pawn-wasm';
 
 // Initialize (once, at app startup)
 await initCompiler();
 
-// Add any include files you need
-addIncludeFile('a_samp.inc', sampIncludeContent);
+// Load your baseline include pack (hosted locally, CDN, etc.)
+await loadIncludeFiles('https://cdn.example.com/includes', [
+  'a_samp.inc',
+  'core.inc',
+  'float.inc'
+]);
+
+// Add/override includes dynamically (e.g., user uploads)
+addIncludeFiles([
+  { filename: 'streamer.inc', content: streamerIncludeContent },
+  { filename: 'sscanf2.inc', content: sscanfIncludeContent }
+]);
 
 // Compile code
 const result = await compile(`
@@ -99,27 +117,33 @@ npm run build
 
 ## Include Files
 
-This package does NOT include SA-MP, open.mp, or third-party plugin includes. You need to:
+**Important:** This package does NOT bundle SA-MP, open.mp, or third-party plugin includes due to licensing and distribution constraints. Everything your script `#include`s has to be added manually before compiling.
 
-1. **Obtain include files** from the appropriate sources:
-   - SA-MP: https://www.sa-mp.com/download.php
-   - open.mp: https://github.com/openmultiplayer/open.mp
-   - Plugins: From their respective repositories
+### How to Add Includes to the Compiler
 
-2. **Add them to the compiler**:
-   ```typescript
-   // Option 1: Add files directly (e.g., from user upload)
-   addIncludeFile('a_samp.inc', includeContent);
+```typescript
+import { initCompiler, addIncludeFile, addIncludeFiles, loadIncludeFiles } from '@pawn-fiddle/pawn-wasm';
 
-   // Option 2: Add multiple files at once
-   addIncludeFiles([
-     { filename: 'a_samp.inc', content: sampContent },
-     { filename: 'core.inc', content: coreContent }
-   ]);
+await initCompiler();
 
-   // Option 3: Load from a server/CDN
-   await loadIncludeFiles('/includes', ['a_samp.inc', 'core.inc']);
-   ```
+// Option 1: Add a single file (useful for user uploads). Paths map to /include/ inside WASM.
+addIncludeFile('a_samp.inc', includeFileContent);
+
+// Option 2: Add multiple files at once (recommended for bulk loading)
+addIncludeFiles([
+  { filename: 'a_samp.inc', content: sampContent },
+  { filename: 'core.inc', content: coreContent },
+  { filename: 'float.inc', content: floatContent }
+]);
+
+// Option 3: Load from a remote server/CDN (async). Provide the base URL, filenames are appended.
+await loadIncludeFiles('https://cdn.example.com/includes', ['a_samp.inc', 'core.inc']);
+```
+
+**Checklist before compiling**
+- `initCompiler()` has resolved
+- Every required `.inc` has been added (or fetched) and matches the name in your `#include`
+- Optional: call `cleanup()` if you need to remove/reload everything
 
 ## Next Steps
 
