@@ -13,7 +13,7 @@ WebAssembly build of the [open.mp Pawn Compiler](https://github.com/openmultipla
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/itsneufox/pawn-wasm.git
+git clone https://github.com/itsneufox/neufox-s-pawn-wasm.git
 cd pawn-wasm
 ```
 
@@ -191,7 +191,7 @@ pawn-wasm/
 Install directly from GitHub:
 
 ```bash
-npm install github:itsneufox/pawn-wasm
+npm install github:itsneufox/neufox-s-pawn-wasm
 ```
 
 Or add to your `package.json`:
@@ -199,7 +199,7 @@ Or add to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@pawn-fiddle/pawn-wasm": "github:itsneufox/pawn-wasm"
+    "@pawn-fiddle/pawn-wasm": "github:itsneufox/neufox-s-pawn-wasm"
   }
 }
 ```
