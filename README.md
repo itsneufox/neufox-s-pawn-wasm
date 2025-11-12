@@ -1,4 +1,4 @@
-# pawn-wasm
+# neufox's pawn-wasm
 
 WebAssembly build of the [open.mp Pawn Compiler](https://github.com/openmultiplayer/compiler) for use in browsers and Node.js.
 
